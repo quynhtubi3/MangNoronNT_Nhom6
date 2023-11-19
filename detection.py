@@ -25,14 +25,15 @@ def predict_rgb_image_vgg(image):
     image = np.array(image, dtype='float32')
     image /= 255
     pred_array = model.predict(image)
-    print(f'pred_array: {pred_array}')
+    #print(f'pred_array: {pred_array}')
     result = gesture_names[np.argmax(pred_array)]
-    print(f'Result: {result}')
-    print(max(pred_array[0]))
+    #print(f'Result: {result}')
+    #print(max(pred_array[0]))
     score = float("%0.2f" % (max(pred_array[0]) * 100))
-    print(result)
+    #print(result)
     return result, score
-
+# là một hàm để dự đoán ký tự từ một hình ảnh RGB. 
+# Nó chuyển đổi hình ảnh thành một mảng numpy, chia nó cho 255 để chuẩn hóa, sau đó sử dụng mô hình để dự đoán ký tự.
 
 # Ham xoa nen khoi anh
 def remove_background(frame):
@@ -93,13 +94,16 @@ while camera.isOpened():
         cv2.imshow('original1', cv2.resize(blur, dsize=None, fx=0.5, fy=0.5))
 
         ret, thresh = cv2.threshold(blur, threshold, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        # chuyển hình ảnh đen trắng thành hình ảnh nhị phân
 
         cv2.imshow('thresh', cv2.resize(thresh, dsize=None, fx=0.5, fy=0.5))
 
         if (np.count_nonzero(thresh)/(thresh.shape[0]*thresh.shape[0])>0.2):
+        # kiểm tra cùng phát hiện có đủ đối tượng để xử lý không(ít nhất 20%)
             # Neu nhu ve duoc hinh ban tay
             if (thresh is not None):
                 # Dua vao mang de predict
+                # cấu hình lại hình ảnh thành rgb ảo và resize để tiến hành dự đoán
                 target = np.stack((thresh,) * 3, axis=-1)
                 target = cv2.resize(target, (224, 224))
                 target = target.reshape(1, 224, 224, 3)
@@ -107,7 +111,7 @@ while camera.isOpened():
 
                 # Neu probality > nguong du doan thi hien thi
                 print(score,prediction)
-                if (score>=predThreshold):
+                if (score>=predThreshold): # nếu điểm lớn hơn ngưỡng dự đoán(95) thì hiển thị lên màn hình
                     cv2.putText(frame, "Sign:" + prediction, (20, 150), cv2.FONT_HERSHEY_SIMPLEX, 3,
                                 (0, 0, 255), 10, lineType=cv2.LINE_AA)
     thresh = None
